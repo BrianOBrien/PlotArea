@@ -23,10 +23,11 @@ Inherits Canvas
 		    dim binWidth as double = w / nbins
 		    //dim halfBinWidth as double = binWidth / 2
 		    
-		    dim gap as double = (binWidth *.2) / 2
+		    dim gap as double = (binWidth *.1) / 2 // make a small gap between bars.
+		    dim scaledWidth as double = binWidth * .9 // .05 + .9 + .05 = 1
 		    
 		    dim maxDataValue as double = Max(data)
-		    dim minDataValue as double = Min(data)
+		    dim minDataValue as double = 0 //Min(data)
 		    dim barYScale as double = h / (maxDataValue-minDataValue)
 		    
 		    dim y as double = g.height - bottomMargin
@@ -35,10 +36,14 @@ Inherits Canvas
 		      Dim x As double = leftMargin + (bin * w / nbins) ' Adjust the starting point to consider the padding
 		      
 		      Dim barHeight As double = (data(bin)-minDataValue)*barYScale
-		      
-		      g.ForeColor = BarColor
-		      
-		      g.FillRect(x+gap, y, binWidth*.80, -barHeight) ' Adjust startX for the position of the current major tick
+		      if BarColors <> nil and BarColors.Ubound <> -1 then
+		        g.ForeColor = BarColors(bin)
+		      else
+		        g.ForeColor = BarColor
+		      end if
+		      g.FillRect(x+gap, y, scaledWidth, -barHeight) ' Adjust startX for the position of the current major tick
+		      g.ForeColor = color.DarkGray
+		      g.drawRect(x+gap, y, scaledWidth, -barHeight) ' Adjust startX for the position of the current major tick
 		      
 		    next
 		  end if
@@ -148,6 +153,16 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Sub Plot(userData() as integer, AxisColor as color, BarColors() as color)
+		  data = userData
+		  me.AxisColor = AxisColor
+		  me.BarColors = BarColors
+		  me.Refresh
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub Plot(userData() as integer, AxisColor as color, BarColor as color)
 		  data = userData
 		  me.AxisColor = AxisColor
@@ -191,6 +206,10 @@ Inherits Canvas
 
 	#tag Property, Flags = &h0
 		BarColor As Color = color.blue
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		BarColors(-1) As Color
 	#tag EndProperty
 
 	#tag Property, Flags = &h21

@@ -23,41 +23,9 @@ Begin Window Window1
    MinWidth        =   64
    Placement       =   0
    Resizeable      =   True
-   Title           =   "Untitled"
+   Title           =   "Histogram Staging"
    Visible         =   True
    Width           =   600
-   Begin Histogram Histogram1
-      AcceptFocus     =   False
-      AcceptTabs      =   False
-      AutoDeactivate  =   True
-      AxisColor       =   &c00000000
-      Backdrop        =   0
-      BarColor        =   &c00000000
-      DoubleBuffer    =   False
-      Enabled         =   True
-      EraseBackground =   True
-      Height          =   336
-      HelpTag         =   ""
-      Index           =   -2147483648
-      InitialParent   =   ""
-      Left            =   20
-      LockBottom      =   True
-      LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   True
-      LockTop         =   True
-      Scope           =   0
-      ShowAxis        =   True
-      ShowTicks       =   True
-      TabIndex        =   0
-      TabPanelIndex   =   0
-      TabStop         =   True
-      Top             =   20
-      Transparent     =   True
-      UseFocusRing    =   True
-      Visible         =   True
-      Width           =   560
-   End
    Begin PushButton PushButton1
       AutoDeactivate  =   True
       Bold            =   False
@@ -90,6 +58,38 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
+   Begin HistogramModule.Histogram Histogram1
+      AcceptFocus     =   False
+      AcceptTabs      =   False
+      AutoDeactivate  =   True
+      AxisColor       =   &c00000000
+      Backdrop        =   0
+      BarColor        =   &c00000000
+      DoubleBuffer    =   False
+      Enabled         =   True
+      EraseBackground =   True
+      Height          =   336
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      Left            =   20
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   True
+      LockTop         =   True
+      Scope           =   1
+      ShowAxis        =   True
+      ShowTicks       =   True
+      TabIndex        =   2
+      TabPanelIndex   =   0
+      TabStop         =   True
+      Top             =   20
+      Transparent     =   True
+      UseFocusRing    =   True
+      Visible         =   True
+      Width           =   560
+   End
 End
 #tag EndWindow
 
@@ -101,10 +101,24 @@ End
 		Sub Action()
 		  dim d(-1) as integer
 		  for i as integer = 0 to 9
-		    d.Append(App.MyRandom.InRange(0, 100))
+		    d.Append(App.MyRandom.InRange(1, 6) + App.MyRandom.InRange(1,6))
 		  next
 		  
-		  Histogram1.Plot(d, color.blue, color.teal)
+		  //Histogram1.Plot(d, color.blue, color.teal)
+		  
+		  dim Palette(9) as Color
+		  Palette(0) = color.Black
+		  Palette(1) = color.Blue
+		  Palette(2) = color.Brown
+		  Palette(3) = color.Cyan
+		  Palette(4) = color.DarkGray
+		  Palette(5) = color.Gray
+		  Palette(6) = color.Green
+		  Palette(7) = color.LightGray
+		  Palette(8) = color.Magenta
+		  Palette(9) = color.Orange
+		  
+		  Histogram1.Plot(d, color.Purple, palette)
 		  
 		End Sub
 	#tag EndEvent
