@@ -31,7 +31,7 @@ Begin Window Window1
       Bold            =   False
       ButtonStyle     =   "0"
       Cancel          =   False
-      Caption         =   "OK"
+      Caption         =   "Plot"
       Default         =   True
       Enabled         =   True
       Height          =   22
@@ -39,11 +39,11 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   20
+      Left            =   500
       LockBottom      =   True
       LockedInPosition=   False
-      LockLeft        =   True
-      LockRight       =   False
+      LockLeft        =   False
+      LockRight       =   True
       LockTop         =   False
       Scope           =   0
       TabIndex        =   1
@@ -58,7 +58,7 @@ Begin Window Window1
       Visible         =   True
       Width           =   80
    End
-   Begin HistogramModule.Histogram Histogram1
+   Begin PlotArea Plot1
       AcceptFocus     =   False
       AcceptTabs      =   False
       AutoDeactivate  =   True
@@ -73,12 +73,13 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Left            =   20
-      LockBottom      =   True
+      LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   True
       LockTop         =   True
-      Scope           =   1
+      PType           =   "PlotType.Line"
+      Scope           =   0
       ShowAxis        =   True
       ShowTicks       =   True
       TabIndex        =   2
@@ -89,6 +90,38 @@ Begin Window Window1
       UseFocusRing    =   True
       Visible         =   True
       Width           =   560
+   End
+   Begin PopupMenu GraphTypePopupMenu
+      AutoDeactivate  =   True
+      Bold            =   False
+      DataField       =   ""
+      DataSource      =   ""
+      Enabled         =   True
+      Height          =   22
+      HelpTag         =   ""
+      Index           =   -2147483648
+      InitialParent   =   ""
+      InitialValue    =   "Bar\r\nLine\r\nScatter"
+      Italic          =   False
+      Left            =   20
+      ListIndex       =   0
+      LockBottom      =   True
+      LockedInPosition=   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   False
+      Scope           =   0
+      TabIndex        =   3
+      TabPanelIndex   =   0
+      TabStop         =   True
+      TextFont        =   "Consolas"
+      TextSize        =   0.0
+      TextUnit        =   0
+      Top             =   369
+      Transparent     =   False
+      Underline       =   False
+      Visible         =   True
+      Width           =   141
    End
 End
 #tag EndWindow
@@ -102,6 +135,7 @@ End
 		  dim d(-1) as integer
 		  for i as integer = 0 to 9
 		    d.Append(App.MyRandom.InRange(1, 6) + App.MyRandom.InRange(1,6))
+		    //d.Append(i^2)
 		  next
 		  
 		  //Histogram1.Plot(d, color.blue, color.teal)
@@ -118,7 +152,14 @@ End
 		  Palette(8) = color.Magenta
 		  Palette(9) = color.Orange
 		  
-		  Histogram1.Plot(d, color.Purple, palette)
+		  select case GraphTypePopupMenu.Text
+		  case "Bar"
+		    Plot1.Plot(d, color.Purple, palette, PlotArea.PlotType.Bar)
+		  case "Line"
+		    Plot1.Plot(d, color.Purple, palette, PlotArea.PlotType.Line)
+		  case "Scatter"
+		    Plot1.Plot(d, color.Purple, palette, PlotArea.PlotType.Scatter)
+		  end select
 		  
 		End Sub
 	#tag EndEvent

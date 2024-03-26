@@ -1,5 +1,5 @@
 #tag Class
-Protected Class Histogram
+Protected Class PlotArea
 Inherits Canvas
 	#tag Event
 		Sub Paint(g As Graphics, areas() As REALbasic.Rect)
@@ -65,6 +65,9 @@ Inherits Canvas
 		  
 		  Dim labelWidth as Integer
 		  dim halfBinWidth as double = w / nbins / 2
+		  if PType <> PlotType.Bar then
+		    halfBinWidth = 0
+		  end if
 		  
 		  If ShowTicks Then
 		    
@@ -79,6 +82,50 @@ Inherits Canvas
 		    next
 		    
 		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub drawLines(g as Graphics)
+		  if data <> nil and data.Ubound <> -1 then
+		    Dim barCount As Integer = Data.Ubound + 1
+		    
+		    // Take the length of the line
+		    dim w as Double = g.Width - leftMargin - rightMargin
+		    dim h as double = g.Height - topMargin - bottomMargin
+		    
+		    //divide the line into nbins.
+		    Dim nbins as integer = data.Ubound+1  // The number of bins
+		    dim binWidth as double = w / nbins
+		    
+		    dim maxDataValue as double = Max(data)
+		    dim minDataValue as double = 0 //Min(data)
+		    dim YScale as double = h / (maxDataValue-minDataValue+1)
+		    
+		    For bin As Integer = 0 To nbins - 2
+		      
+		      Dim x1 As double = leftMargin + (bin * w / nbins) ' Adjust the starting point to consider the padding
+		      Dim y1 As double = (data(bin)-minDataValue)*YScale
+		      
+		      Dim x2 As double = leftMargin + ((bin+1) * w / nbins) ' Adjust the starting point to consider the padding
+		      Dim y2 As double = (data(bin+1)-minDataValue)*YScale
+		      
+		      y1 = h - y1 + topMargin
+		      y2 = h - y2 + topMargin
+		      
+		      if BarColors <> nil and BarColors.Ubound <> -1 then
+		        g.ForeColor = BarColors(bin)
+		      else
+		        g.ForeColor = BarColor
+		      end if
+		      
+		      PlotPointCircle(g,x1,y1,3)
+		      g.DrawLine(x1,y1,x2,y2)
+		      PlotPointCircle(g,x2,y2,3)
+		      
+		    next
+		  end if
 		  
 		End Sub
 	#tag EndMethod
@@ -153,21 +200,24 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Plot(userData() as integer, AxisColor as color, BarColors() as color)
+		Sub Plot(userData() as integer, AxisColor as color, BarColors() as color, ptype as PlotType)
 		  data = userData
 		  me.AxisColor = AxisColor
 		  me.BarColors = BarColors
+		  me.PType = ptype
 		  me.Refresh
 		  
 		End Sub
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Plot(userData() as integer, AxisColor as color, BarColor as color)
+		Sub Plot(userData() as integer, AxisColor as color, BarColor as color, ptype as PlotType)
 		  data = userData
 		  me.AxisColor = AxisColor
 		  me.BarColor = BarColor
+		  me.PType = ptype
 		  me.Refresh
+		  
 		  
 		End Sub
 	#tag EndMethod
@@ -179,8 +229,22 @@ Inherits Canvas
 		      drawHorizontalAxis(g)
 		      drawVerticalAxis(g)
 		    end if
-		    drawBars(g)
+		    select case PType
+		    case PlotType.Bar
+		      drawBars(g)
+		    case PlotType.Line
+		      drawLines(g)
+		    case PlotType.Scatter
+		    end select
 		  End If
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
+		Sub PlotPointCircle(g as Graphics, x as double, y as Double, r as Double)
+		  g.ForeColor = color.red
+		  g.FillOval(x-r,y-2, 2*r, 2*r)
 		  
 		End Sub
 	#tag EndMethod
@@ -217,6 +281,10 @@ Inherits Canvas
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
+		PType As PlotType = PlotType.Line
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
 		ShowAxis As Boolean = True
 	#tag EndProperty
 
@@ -239,6 +307,13 @@ Inherits Canvas
 
 	#tag Constant, Name = topMargin, Type = Double, Dynamic = False, Default = \"10", Scope = Public
 	#tag EndConstant
+
+
+	#tag Enum, Name = PlotType, Type = Integer, Flags = &h0
+		Bar
+		  Line
+		Scatter
+	#tag EndEnum
 
 
 	#tag ViewBehavior
@@ -440,6 +515,18 @@ Inherits Canvas
 		#tag ViewProperty
 			Name="InitialParent"
 			Type="String"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="PType"
+			Group="Behavior"
+			InitialValue="PlotType.Line"
+			Type="PlotType"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Bar"
+				"1 - Line"
+				"2 - Scatter"
+			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
