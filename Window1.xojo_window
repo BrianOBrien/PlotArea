@@ -73,7 +73,7 @@ Begin Window Window1
       Index           =   -2147483648
       InitialParent   =   ""
       Left            =   20
-      LockBottom      =   False
+      LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   True
@@ -133,12 +133,41 @@ End
 	#tag Event
 		Sub Action()
 		  dim d(-1) as integer
-		  for i as integer = 0 to 9
-		    d.Append(App.MyRandom.InRange(1, 6) + App.MyRandom.InRange(1,6))
-		    //d.Append(i^2)
-		  next
+		  dim x,y as integer
 		  
-		  //Histogram1.Plot(d, color.blue, color.teal)
+		  if GraphTypePopupMenu.Text = "Scatter" then
+		    // make four distributions of clusters.
+		    for n as integer = 0 to 9
+		      
+		      x = App.MyRandom.InRange(0, 10)
+		      y = App.MyRandom.InRange(0, 10)
+		      d.Append(x)
+		      d.Append(y)
+		      
+		      x = App.MyRandom.InRange(-10, 0)
+		      y = App.MyRandom.InRange(0, 10)
+		      d.Append(x)
+		      d.Append(y)
+		      
+		      x = App.MyRandom.InRange(-10, 0)
+		      y = App.MyRandom.InRange(-10, 0)
+		      d.Append(x)
+		      d.Append(y)
+		      
+		      x = App.MyRandom.InRange(0, 10)
+		      y = App.MyRandom.InRange(-10, 0)
+		      d.Append(x)
+		      d.Append(y)
+		      
+		    next
+		    
+		    
+		  else
+		    for i as integer = 0 to 9
+		      d.Append(App.MyRandom.InRange(1, 6) + App.MyRandom.InRange(1,6))
+		      //d.Append(i^2)
+		    next
+		  end if
 		  
 		  dim Palette(9) as Color
 		  Palette(0) = color.Black

@@ -37,7 +37,7 @@ Inherits Canvas
 		      
 		      Dim barHeight As double = (data(bin)-minDataValue)*barYScale
 		      if BarColors <> nil and BarColors.Ubound <> -1 then
-		        g.ForeColor = BarColors(bin)
+		        g.ForeColor = BarColors(BarColors.Ubound mod bin)
 		      else
 		        g.ForeColor = BarColor
 		      end if
@@ -123,6 +123,77 @@ Inherits Canvas
 		      PlotPointCircle(g,x1,y1,3)
 		      g.DrawLine(x1,y1,x2,y2)
 		      PlotPointCircle(g,x2,y2,3)
+		      
+		    next
+		  end if
+		  
+		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h21
+		Private Sub drawPoints(g as Graphics)
+		  if data <> nil and data.Ubound <> -1 then
+		    
+		    //Points in the data are organized in pairs of x,y 
+		    Dim barCount As Integer = Data.Ubound + 1
+		    barCount = barCount \ 2  // Therefore should also be even.
+		    
+		    // Take the length of the line
+		    dim w as Double = g.Width - leftMargin - rightMargin
+		    dim h as double = g.Height - topMargin - bottomMargin
+		    
+		    //divide the line into nbins.
+		    Dim nbins as integer = data.Ubound+1  // The number of bins
+		    dim binWidth as double = w / nbins
+		    
+		    dim minX, maxX, minY, maxY as double
+		    
+		    minX = data(0)
+		    minY = data(1)
+		    maxX = minX
+		    maxY = minY
+		    for p as integer = 0 to data.Ubound step 2
+		      if data(p) < minX then 
+		        minX = data(p) 
+		      end if
+		      if data(p) > maxX then 
+		        maxX = data(p) 
+		      end if
+		      if data(p+1) < minY then 
+		        minY = data(p+1) 
+		      end if
+		      if data(p+1) > maxY then 
+		        maxY = data(p+1) 
+		      end if
+		    next
+		    
+		    dim XScale, YScale as double
+		    XScale = w / (maxX-minX+1)
+		    YScale = h / (maxY-minY+1)
+		    
+		    
+		    for p as integer = 0 to data.Ubound step 2
+		      
+		      dim x as double = data(p)
+		      dim y as double = data(p+1)
+		      
+		      x = x - minX
+		      y = y - MinY
+		      x = x * XScale
+		      y = y * YScale
+		      
+		      x = x + leftMargin
+		      y = y + topMargin
+		      
+		      y = h - y  // because 0 is at the top not the bottom. 
+		      
+		      if BarColors <> nil and BarColors.Ubound <> -1 then
+		        g.ForeColor = BarColors(9 mod (p\2))
+		      else
+		        g.ForeColor = BarColor
+		      end if
+		      
+		      PlotPointCircle(g,x,y,3)
 		      
 		    next
 		  end if
@@ -235,14 +306,15 @@ Inherits Canvas
 		    case PlotType.Line
 		      drawLines(g)
 		    case PlotType.Scatter
+		      drawPoints(g)
 		    end select
 		  End If
 		  
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h0
-		Sub PlotPointCircle(g as Graphics, x as double, y as Double, r as Double)
+	#tag Method, Flags = &h21
+		Private Sub PlotPointCircle(g as Graphics, x as double, y as Double, r as Double)
 		  g.ForeColor = color.red
 		  g.FillOval(x-r,y-2, 2*r, 2*r)
 		  
