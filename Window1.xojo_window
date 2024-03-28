@@ -161,11 +161,13 @@ End
 		      
 		    next
 		    
-		    
-		  else
+		  elseif GraphTypePopupMenu.Text = "Bar" then
 		    for i as integer = 0 to 9
 		      d.Append(App.MyRandom.InRange(1, 6) + App.MyRandom.InRange(1,6))
-		      //d.Append(i^2)
+		    next
+		  else
+		    for i as integer = 0 to 9
+		      d.Append(i^2)
 		    next
 		  end if
 		  

@@ -148,6 +148,7 @@ Inherits Canvas
 		    
 		    dim minX, maxX, minY, maxY as double
 		    
+		    // Because data is in x,y format can't use the min max methods.
 		    minX = data(0)
 		    minY = data(1)
 		    maxX = minX
@@ -183,7 +184,7 @@ Inherits Canvas
 		      y = y * YScale
 		      
 		      x = x + leftMargin
-		      y = y + topMargin
+		      y = y - topMargin
 		      
 		      y = h - y  // because 0 is at the top not the bottom. 
 		      
@@ -211,12 +212,13 @@ Inherits Canvas
 		  Dim h As Double = g.Height - topMargin - bottomMargin
 		  
 		  ' Determine the maximum value in the data array
-		  Dim maxValue As Double = Max(data)
+		  Dim maxValue As Double = ceil(Max(data))
+		  dim minValue as Double = floor(Min(data))
 		  dim numTicks as Integer = 10
 		  
 		  ' Calculate the number of ticks based on a desired interval
-		  Dim tickInterval As Double = maxValue / numTicks
-		  Dim tickValue As Double = 0
+		  Dim tickInterval As Double = (maxValue-minValue+1) / numTicks
+		  Dim tickValue As Double = minValue
 		  Dim labelPadding as double = 2
 		  
 		  ' Draw ticks and labels
@@ -227,7 +229,8 @@ Inherits Canvas
 		    g.DrawLine(leftMargin - tickSize, y, leftMargin, y)
 		    
 		    ' Draw label
-		    g.DrawString(Format(tickValue, "0.0"), leftMargin - tickSize - labelPadding - StringWidth(g, Format(tickValue, "0.0")), y + g.TextHeight /4)
+		    dim vstr as string = Format(tickValue, "+0.0")
+		    g.DrawString(vstr, leftMargin - tickSize - labelPadding - StringWidth(g, vstr), y + g.TextHeight /4)
 		    
 		    ' Increment tick value
 		    tickValue = tickValue + tickInterval
