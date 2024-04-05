@@ -23,7 +23,7 @@ Begin Window Window1
    MinWidth        =   64
    Placement       =   0
    Resizeable      =   True
-   Title           =   "Histogram Staging"
+   Title           =   "Staging"
    Visible         =   True
    Width           =   600
    Begin PushButton PushButton1
@@ -35,16 +35,16 @@ Begin Window Window1
       Default         =   True
       Enabled         =   True
       Height          =   22
-      HelpTag         =   ""
+      HelpTag         =   "Push me"
       Index           =   -2147483648
       InitialParent   =   ""
       Italic          =   False
-      Left            =   500
-      LockBottom      =   True
+      Left            =   173
+      LockBottom      =   False
       LockedInPosition=   False
-      LockLeft        =   False
-      LockRight       =   True
-      LockTop         =   False
+      LockLeft        =   True
+      LockRight       =   False
+      LockTop         =   True
       Scope           =   0
       TabIndex        =   1
       TabPanelIndex   =   0
@@ -52,7 +52,7 @@ Begin Window Window1
       TextFont        =   "Consolas"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   368
+      Top             =   12
       Transparent     =   False
       Underline       =   False
       Visible         =   True
@@ -64,15 +64,14 @@ Begin Window Window1
       AutoDeactivate  =   True
       AxisColor       =   &c00000000
       Backdrop        =   0
-      BarColor        =   &c00000000
       DoubleBuffer    =   False
       Enabled         =   True
       EraseBackground =   True
-      Height          =   336
+      Height          =   327
       HelpTag         =   ""
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   20
+      Left            =   12
       LockBottom      =   True
       LockedInPosition=   False
       LockLeft        =   True
@@ -82,14 +81,14 @@ Begin Window Window1
       Scope           =   0
       ShowAxis        =   True
       ShowTicks       =   True
-      TabIndex        =   2
+      TabIndex        =   1
       TabPanelIndex   =   0
       TabStop         =   True
-      Top             =   20
+      Top             =   53
       Transparent     =   True
       UseFocusRing    =   True
       Visible         =   True
-      Width           =   560
+      Width           =   568
    End
    Begin PopupMenu GraphTypePopupMenu
       AutoDeactivate  =   True
@@ -98,26 +97,26 @@ Begin Window Window1
       DataSource      =   ""
       Enabled         =   True
       Height          =   22
-      HelpTag         =   ""
+      HelpTag         =   "Select the type of graph then plot it."
       Index           =   -2147483648
       InitialParent   =   ""
       InitialValue    =   "Bar\r\nLine\r\nScatter"
       Italic          =   False
-      Left            =   20
+      Left            =   12
       ListIndex       =   0
-      LockBottom      =   True
+      LockBottom      =   False
       LockedInPosition=   False
       LockLeft        =   True
       LockRight       =   False
-      LockTop         =   False
+      LockTop         =   True
       Scope           =   0
-      TabIndex        =   3
+      TabIndex        =   2
       TabPanelIndex   =   0
       TabStop         =   True
       TextFont        =   "Consolas"
       TextSize        =   0.0
       TextUnit        =   0
-      Top             =   369
+      Top             =   12
       Transparent     =   False
       Underline       =   False
       Visible         =   True
@@ -183,6 +182,7 @@ End
 		  Palette(8) = color.Magenta
 		  Palette(9) = color.Orange
 		  
+		  Plot1.ClearData
 		  select case GraphTypePopupMenu.Text
 		  case "Bar"
 		    Plot1.Plot(d, color.Purple, palette, PlotArea.PlotType.Bar)

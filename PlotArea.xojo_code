@@ -9,10 +9,16 @@ Inherits Canvas
 	#tag EndEvent
 
 
+	#tag Method, Flags = &h0
+		Sub ClearData()
+		  redim data(-1)
+		  redim BarColors(-1)
+		End Sub
+	#tag EndMethod
+
 	#tag Method, Flags = &h21
 		Private Sub drawBars(g as Graphics)
 		  if data <> nil and data.Ubound <> -1 then
-		    Dim barCount As Integer = Data.Ubound + 1
 		    
 		    // Take the length of the line
 		    dim w as Double = g.Width - leftMargin - rightMargin
@@ -21,13 +27,12 @@ Inherits Canvas
 		    //divide the line into nbins.
 		    Dim nbins as integer = data.Ubound+1  // The number of bins
 		    dim binWidth as double = w / nbins
-		    //dim halfBinWidth as double = binWidth / 2
 		    
 		    dim gap as double = (binWidth *.1) / 2 // make a small gap between bars.
 		    dim scaledWidth as double = binWidth * .9 // .05 + .9 + .05 = 1
 		    
 		    dim maxDataValue as double = Max(data)
-		    dim minDataValue as double = 0 //Min(data)
+		    dim minDataValue as double = Min(data)
 		    dim barYScale as double = h / (maxDataValue-minDataValue)
 		    
 		    dim y as double = g.height - bottomMargin
@@ -35,13 +40,12 @@ Inherits Canvas
 		      
 		      Dim x As double = leftMargin + (bin * w / nbins) ' Adjust the starting point to consider the padding
 		      
-		      Dim barHeight As double = (data(bin)-minDataValue)*barYScale
-		      if BarColors <> nil and BarColors.Ubound <> -1 then
-		        g.ForeColor = BarColors(BarColors.Ubound mod bin)
-		      else
-		        g.ForeColor = BarColor
-		      end if
+		      dim v as double = data(bin)
+		      Dim barHeight As double = (v-minDataValue)*barYScale
+		      
+		      g.ForeColor = BarColors(bin)
 		      g.FillRect(x+gap, y, scaledWidth, -barHeight) ' Adjust startX for the position of the current major tick
+		      
 		      g.ForeColor = color.DarkGray
 		      g.drawRect(x+gap, y, scaledWidth, -barHeight) ' Adjust startX for the position of the current major tick
 		      
@@ -89,7 +93,6 @@ Inherits Canvas
 	#tag Method, Flags = &h21
 		Private Sub drawLines(g as Graphics)
 		  if data <> nil and data.Ubound <> -1 then
-		    Dim barCount As Integer = Data.Ubound + 1
 		    
 		    // Take the length of the line
 		    dim w as Double = g.Width - leftMargin - rightMargin
@@ -97,7 +100,6 @@ Inherits Canvas
 		    
 		    //divide the line into nbins.
 		    Dim nbins as integer = data.Ubound+1  // The number of bins
-		    dim binWidth as double = w / nbins
 		    
 		    dim maxDataValue as double = Max(data)
 		    dim minDataValue as double = 0 //Min(data)
@@ -114,11 +116,7 @@ Inherits Canvas
 		      y1 = h - y1 + topMargin
 		      y2 = h - y2 + topMargin
 		      
-		      if BarColors <> nil and BarColors.Ubound <> -1 then
-		        g.ForeColor = BarColors(bin)
-		      else
-		        g.ForeColor = BarColor
-		      end if
+		      g.ForeColor = BarColors(bin)
 		      
 		      PlotPointCircle(g,x1,y1,3)
 		      g.DrawLine(x1,y1,x2,y2)
@@ -143,8 +141,6 @@ Inherits Canvas
 		    dim h as double = g.Height - topMargin - bottomMargin
 		    
 		    //divide the line into nbins.
-		    Dim nbins as integer = data.Ubound+1  // The number of bins
-		    dim binWidth as double = w / nbins
 		    
 		    dim minX, maxX, minY, maxY as double
 		    
@@ -172,11 +168,11 @@ Inherits Canvas
 		    XScale = w / (maxX-minX+1)
 		    YScale = h / (maxY-minY+1)
 		    
-		    
-		    for p as integer = 0 to data.Ubound step 2
+		    dim npairs as integer = (data.Ubound+1)/2
+		    for p as integer = 0 to npairs-1
 		      
-		      dim x as double = data(p)
-		      dim y as double = data(p+1)
+		      dim x as double = data(p*2)
+		      dim y as double = data(p*2+1)
 		      
 		      x = x - minX
 		      y = y - MinY
@@ -188,12 +184,8 @@ Inherits Canvas
 		      
 		      y = h - y  // because 0 is at the top not the bottom. 
 		      
-		      if BarColors <> nil and BarColors.Ubound <> -1 then
-		        g.ForeColor = BarColors(9 mod (p\2))
-		      else
-		        g.ForeColor = BarColor
-		      end if
-		      
+		      dim c as Integer = p mod BarColors.Ubound
+		      g.ForeColor = BarColors(c) // Caveat wrap around
 		      PlotPointCircle(g,x,y,3)
 		      
 		    next
@@ -274,24 +266,17 @@ Inherits Canvas
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
-		Sub Plot(userData() as integer, AxisColor as color, BarColors() as color, ptype as PlotType)
-		  data = userData
+		Sub Plot(userData() as integer, AxisColor as color, newBarColors() as color, ptype as PlotType)
+		  for i as integer = 0 to userData.Ubound
+		    data.Append(userData(i))
+		  next
+		  for i as integer = 0 to newBarColors.Ubound
+		    BarColors.Append(newBarColors(i))
+		  next
+		  
 		  me.AxisColor = AxisColor
-		  me.BarColors = BarColors
 		  me.PType = ptype
 		  me.Refresh
-		  
-		End Sub
-	#tag EndMethod
-
-	#tag Method, Flags = &h0
-		Sub Plot(userData() as integer, AxisColor as color, BarColor as color, ptype as PlotType)
-		  data = userData
-		  me.AxisColor = AxisColor
-		  me.BarColor = BarColor
-		  me.PType = ptype
-		  me.Refresh
-		  
 		  
 		End Sub
 	#tag EndMethod
@@ -318,7 +303,7 @@ Inherits Canvas
 
 	#tag Method, Flags = &h21
 		Private Sub PlotPointCircle(g as Graphics, x as double, y as Double, r as Double)
-		  g.ForeColor = color.red
+		  //g.ForeColor = color.red
 		  g.FillOval(x-r,y-2, 2*r, 2*r)
 		  
 		End Sub
@@ -341,10 +326,6 @@ Inherits Canvas
 
 	#tag Property, Flags = &h0
 		AxisColor As Color = color.red
-	#tag EndProperty
-
-	#tag Property, Flags = &h0
-		BarColor As Color = color.blue
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
@@ -547,13 +528,6 @@ Inherits Canvas
 			EditorType="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="BarColor"
-			Visible=true
-			Group="Behavior"
-			InitialValue="color.blue"
-			Type="Color"
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="ShowAxis"
 			Visible=true
 			Group="Behavior"
@@ -575,6 +549,19 @@ Inherits Canvas
 			Type="Color"
 		#tag EndViewProperty
 		#tag ViewProperty
+			Name="PType"
+			Visible=true
+			Group="Behavior"
+			InitialValue="PlotType.Line"
+			Type="PlotType"
+			EditorType="Enum"
+			#tag EnumValues
+				"0 - Bar"
+				"1 - Line"
+				"2 - Scatter"
+			#tag EndEnumValues
+		#tag EndViewProperty
+		#tag ViewProperty
 			Name="TabPanelIndex"
 			Group="Position"
 			InitialValue="0"
@@ -590,18 +577,6 @@ Inherits Canvas
 		#tag ViewProperty
 			Name="InitialParent"
 			Type="String"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="PType"
-			Group="Behavior"
-			InitialValue="PlotType.Line"
-			Type="PlotType"
-			EditorType="Enum"
-			#tag EnumValues
-				"0 - Bar"
-				"1 - Line"
-				"2 - Scatter"
-			#tag EndEnumValues
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
