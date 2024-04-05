@@ -1,2 +1,2 @@
-# Histogram
-This is the test harness for the histogram canvas class.
+# Plot Area
+This is the test harness for the Plot Area canvas class.
